@@ -13,6 +13,13 @@ const API_KEY = process.env.MG_API_KEY;
 const DOMAIN = process.env.MG_DOMAIN;
 const mailgun = require("mailgun-js")({ apiKey: API_KEY, domain: DOMAIN });
 
+//Route d'accueil pour MongoDB ATLAS
+app.get("/", (req, res) => {
+  res
+    .status(200)
+    .json({ message: "Welcome to Form Trip Advisor API by Lily !" });
+});
+
 //Route post : envoyer les données du formulaire
 app.post("/form", async (req, res) => {
   try {
