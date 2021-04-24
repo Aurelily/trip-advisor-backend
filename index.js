@@ -21,12 +21,17 @@ app.get("/", (req, res) => {
 });
 
 //Route post : envoyer les données du formulaire
-app.post("/form", async (req, res) => {
-  try {
-    console.log("Entrée dans le route Form");
+app.post("/form", (req, res) => {
+  console.log("Entrée dans le route Form");
 
+  if (
+    req.fields.firstname &&
+    req.fields.lastname &&
+    req.fields.email &&
+    req.fields.message
+  ) {
     const data = {
-      from: `${req.fields.firstname} ${req.fields.lastname} <${req.fields.email}`,
+      from: `${req.fields.firstname} ${req.fields.lastname} <${req.fields.email}>`,
       to: "aurelie.preaud@gmail.com",
       subject: `Formulaire contact par ${req.fields.email}`,
       text: `${req.fields.message}`,
@@ -37,9 +42,9 @@ app.post("/form", async (req, res) => {
       console.log(error);
     });
 
-    res.json({ message: "Données reçues, mail envoyé" });
-  } catch (error) {
-    res.json({ error: error.message });
+    res.status(200).json({ message: "Données reçues, mail envoyé" });
+  } else {
+    res.status(400).json({ message: "Vous devez remplir tous les champs" });
   }
 });
 
