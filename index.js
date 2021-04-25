@@ -1,7 +1,6 @@
 const express = require("express");
 const formidable = require("express-formidable");
 const cors = require("cors");
-const { json } = require("body-parser");
 require("dotenv").config();
 
 const app = express();
@@ -23,25 +22,22 @@ app.get("/", (req, res) => {
 //Route post : envoyer les données du formulaire
 app.post("/form", (req, res) => {
   console.log("Entrée dans le route Form");
-
+  ///Destructuring des variables
   const { firstname, lastname, email, message } = req.fields;
-
+  ///Création de l'objet data
   const data = {
     from: `${firstname} ${lastname} <${email}>`,
     to: "aurelie.preaud@gmail.com",
-    subject: `Formulaire contact par ${email}`,
+    subject: `Un message de la part de ${email}`,
     text: `${message}`,
   };
-  // envoie de l'objet data via Mailgun
+  ///Envoie de l'objet data via Mailgun
   mailgun.messages().send(data, (error, body) => {
     if (!error) {
       return res.status(200).json(body);
-    } else {
-      res.status(401).json(error);
     }
+    res.status(401).json(error);
   });
-
-  res.status(200).json({ message: "Données reçues, mail envoyé" });
 });
 
 app.all("*", (req, res) => {
