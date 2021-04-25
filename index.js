@@ -13,7 +13,7 @@ const API_KEY = process.env.MG_API_KEY;
 const DOMAIN = process.env.MG_DOMAIN;
 const mailgun = require("mailgun-js")({ apiKey: API_KEY, domain: DOMAIN });
 
-//Route d'accueil pour MongoDB ATLAS
+//Route d'accueil pour MongoDB ATLAS et HEROKU
 app.get("/", (req, res) => {
   res
     .status(200)
@@ -24,28 +24,24 @@ app.get("/", (req, res) => {
 app.post("/form", (req, res) => {
   console.log("Entrée dans le route Form");
 
-  if (
-    req.fields.firstname &&
-    req.fields.lastname &&
-    req.fields.email &&
-    req.fields.message
-  ) {
-    const data = {
-      from: `${req.fields.firstname} ${req.fields.lastname} <${req.fields.email}>`,
-      to: "aurelie.preaud@gmail.com",
-      subject: `Formulaire contact par ${req.fields.email}`,
-      text: `${req.fields.message}`,
-    };
+  const { firstname, lastname, email, message } = req.fields;
 
-    mailgun.messages().send(data, (error, body) => {
-      console.log(body);
-      console.log(error);
-    });
+  const data = {
+    from: `${firstname} ${lastname} <${email}>`,
+    to: "aurelie.preaud@gmail.com",
+    subject: `Formulaire contact par ${email}`,
+    text: `${message}`,
+  };
+  // envoie de l'objet data via Mailgun
+  mailgun.messages().send(data, (error, body) => {
+    if (!error) {
+      return res.status(200).json(body);
+    } else {
+      res.status(401).json(error);
+    }
+  });
 
-    res.status(200).json({ message: "Données reçues, mail envoyé" });
-  } else {
-    res.status(400).json({ message: "Vous devez remplir tous les champs" });
-  }
+  res.status(200).json({ message: "Données reçues, mail envoyé" });
 });
 
 app.all("*", (req, res) => {
